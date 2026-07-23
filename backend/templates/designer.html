@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flow Designer - Conversational IVR Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <style>
+    #canvas-container {
+      width: 100%;
+      height: 500px;
+      background-color: #0b0f19;
+      background-size: 20px 20px;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+    .node {
+      position: absolute;
+      width: 160px;
+      background: var(--bg-card);
+      border: 2px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text-primary);
+      cursor: move;
+      z-index: 10;
+    }
+    .node-header {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      color: var(--accent-color);
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="sidebar-brand">IVR Platform</div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a href="/simulator">Call Simulator</a></li>
+        <li class="nav-item active"><a href="/designer">Flow Designer</a></li>
+        <li class="nav-item"><a href="/kb">Knowledge Base</a></li>
+        <li class="nav-item admin-only"><a href="/admin">Admin Panel</a></li>
+        <li class="nav-item"><a href="/login" onclick="fetch('/api/logout')">Logout</a></li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Visual IVR Flow Designer</h2>
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary btn-sm" onclick="saveFlow()">Save Flow</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportFlow()">Export JSON</button>
+          <button class="btn btn-secondary btn-sm" onclick="importFlow()">Import JSON</button>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <!-- Node Panel -->
+        <div class="col-md-3">
+          <div class="glass-card">
+            <h5>Control Toolbox</h5>
+            <p class="text-muted small">Click nodes below to add them to canvas and connect nodes.</p>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-info btn-sm text-start" onclick="addNode('start')">🟢 Start Node</button>
+              <button class="btn btn-outline-primary btn-sm text-start" onclick="addNode('menu')">📂 Menu Node</button>
+              <button class="btn btn-outline-warning btn-sm text-start" onclick="addNode('transfer')">📞 Transfer Node</button>
+              <button class="btn btn-outline-danger btn-sm text-start" onclick="addNode('end')">🛑 End Node</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="col-md-9">
+          <div class="glass-card">
+            <div id="canvas-container">
+              <!-- Dynamically populated nodes -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Panel -->
+      <div class="glass-card">
+        <h5>Node Properties</h5>
+        <div id="property-panel" class="text-muted small">Select a node on the canvas to edit properties.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/designer.js') }}"></script>
+</body>
+</html>

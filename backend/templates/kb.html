@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Knowledge Base - Conversational IVR Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="sidebar-brand">IVR Platform</div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a href="/simulator">Call Simulator</a></li>
+        <li class="nav-item"><a href="/designer">Flow Designer</a></li>
+        <li class="nav-item active"><a href="/kb">Knowledge Base</a></li>
+        <li class="nav-item admin-only"><a href="/admin">Admin Panel</a></li>
+        <li class="nav-item"><a href="/login" onclick="fetch('/api/logout')">Logout</a></li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <h2>Offline Knowledge Base</h2>
+      <p class="text-muted">Upload company documentation (PDF, TXT, DOCX) to index content locally. Use local Vector Search to answer queries without cloud dependency.</p>
+
+      <div class="row g-4 mb-4">
+        <!-- Upload -->
+        <div class="col-md-5">
+          <div class="glass-card">
+            <h5 class="mb-3">Upload Documents</h5>
+            <div id="upload-status" class="alert alert-info d-none"></div>
+            <form id="upload-form" enctype="multipart/form-data">
+              <div class="mb-3">
+                <input type="file" class="form-input form-control" id="kb-file" name="file" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Upload & Index Document</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Query Engine -->
+        <div class="col-md-7">
+          <div class="glass-card">
+            <h5 class="mb-3">Search Vector Store</h5>
+            <div class="input-group mb-3">
+              <input type="text" class="form-input" id="search-query" placeholder="Ask a question, e.g. What is the baggage allowance?">
+              <button class="btn btn-primary" onclick="searchKB()">Search</button>
+            </div>
+            
+            <div id="search-results">
+              <div class="text-muted small">No search queries run yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indexed files -->
+      <div class="glass-card">
+        <h5 class="mb-3">Indexed Documents</h5>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover">
+            <thead>
+              <tr>
+                <th>Document Name</th>
+                <th>Indexed Timestamp</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="docs-list">
+              <tr><td colspan="3" class="text-muted text-center">No documents indexed. Upload files above to index.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      loadDocs();
+    });
+
+    async function loadDocs() {
+      const res = await fetch("/api/kb");
+      const data = await res.json();
+      const tbody = document.getElementById("docs-list");
+      tbody.innerHTML = "";
+      
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center">No documents indexed. Upload files above to index.</td></tr>';
+        return;
+      }
+      
+      data.forEach(doc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${doc.filename}</td>
+          <td>${doc.uploaded_at}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteDoc(${doc.id})">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById("upload-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const statusDiv = document.getElementById("upload-status");
+      statusDiv.innerText = "Processing document and rebuilding vector index...";
+      statusDiv.classList.remove("d-none");
+      
+      const formData = new FormData();
+      formData.append("file", document.getElementById("kb-file").files[0]);
+      
+      const res = await fetch("/api/kb", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        statusDiv.innerText = "Successfully indexed!";
+        loadDocs();
+      } else {
+        statusDiv.innerText = data.error || "Failed to upload.";
+      }
+    };
+
+    async function deleteDoc(id) {
+      await fetch(`/api/kb/${id}`, {method: "DELETE"});
+      loadDocs();
+    }
+
+    async function searchKB() {
+      const q = document.getElementById("search-query").value;
+      if (!q) return;
+      
+      const resultsDiv = document.getElementById("search-results");
+      resultsDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div> Searching...';
+      
+      const res = await fetch("/api/kb/search", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({query: q})
+      });
+      const data = await res.json();
+      
+      resultsDiv.innerHTML = "";
+      if (data.length === 0) {
+        resultsDiv.innerHTML = '<div class="alert alert-warning">No relevant content matching that query could be found.</div>';
+        return;
+      }
+      
+      data.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "p-3 mb-2 bg-black rounded border border-secondary";
+        div.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>Source: ${r.filename}</strong>
+            <span class="badge bg-success">Similarity: ${r.score}</span>
+          </div>
+          <p class="mb-0 text-muted small">${r.content}</p>
+        `;
+        resultsDiv.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>

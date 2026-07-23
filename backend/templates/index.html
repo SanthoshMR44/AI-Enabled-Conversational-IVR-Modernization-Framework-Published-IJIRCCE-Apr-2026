@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Conversational IVR Modernization Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <style>
+    .feature-card {
+      height: 100%;
+      transition: transform 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand font-weight-bold" href="#">Conversational IVR SaaS</a>
+      <div class="d-flex">
+        <a href="/login" class="btn btn-outline-light me-2">Log In</a>
+        <a href="/signup" class="btn btn-primary">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero text-center container my-5">
+    <h1>Modernize Legacy IVR Systems <br>With Offline Machine Learning</h1>
+    <p class="lead text-muted my-3">Deploy advanced intent recognition, visual call flow designer, and knowledge base search, all running locally without internet access or expensive API dependencies.</p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="/login" class="btn btn-primary btn-lg">Get Started</a>
+      <a href="#features" class="btn btn-secondary btn-lg">Learn More</a>
+    </div>
+  </header>
+
+  <section id="features" class="container my-5 py-5">
+    <h2 class="text-center mb-5">Platform Core Features</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="glass-card feature-card text-center">
+          <h3 class="h5 mb-3">100% Offline NLP</h3>
+          <p class="text-muted">Uses spaCy, NLTK, and TextBlob for offline Entity Extraction, Intent Identification and Sentiment Analysis.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="glass-card feature-card text-center">
+          <h3 class="h5 mb-3">Visual Flow Builder</h3>
+          <p class="text-muted">Drag, drop, and link routing nodes to customize your customer experience and export to JSON.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="glass-card feature-card text-center">
+          <h3 class="h5 mb-3">Vector Knowledge Search</h3>
+          <p class="text-muted">Upload company files (PDF, DOCX, TXT) and search contents locally via Cosine Similarity.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-dark text-center text-muted py-4 mt-5">
+    <div class="container">
+      <p>&copy; 2026 Conversational IVR Modernization Framework. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

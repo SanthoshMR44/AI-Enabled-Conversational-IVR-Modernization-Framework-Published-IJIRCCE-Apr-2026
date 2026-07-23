@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Call Simulator - Conversational IVR Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="sidebar-brand">IVR Platform</div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="nav-item active"><a href="/simulator">Call Simulator</a></li>
+        <li class="nav-item"><a href="/designer">Flow Designer</a></li>
+        <li class="nav-item"><a href="/kb">Knowledge Base</a></li>
+        <li class="nav-item admin-only"><a href="/admin">Admin Panel</a></li>
+        <li class="nav-item"><a href="/login" onclick="fetch('/api/logout')">Logout</a></li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <div class="row">
+        <!-- Call Screen & Keypad -->
+        <div class="col-md-6 mb-4">
+          <div class="glass-card text-center">
+            <h4 class="mb-4">Call Simulator</h4>
+            
+            <div class="phone-container">
+              <div class="screen mb-3" id="phone-screen">
+                <div class="text-muted">Press "Start Call" to initiate simulated voice dialog session.</div>
+              </div>
+              
+              <div class="text-secondary mb-3" id="call-status">Call Disconnected</div>
+              
+              <div class="keypad">
+                <button class="digit" onclick="pressDigit('1')">1</button>
+                <button class="digit" onclick="pressDigit('2')">2</button>
+                <button class="digit" onclick="pressDigit('3')">3</button>
+                <button class="digit" onclick="pressDigit('4')">4</button>
+                <button class="digit" onclick="pressDigit('5')">5</button>
+                <button class="digit" onclick="pressDigit('6')">6</button>
+                <button class="digit" onclick="pressDigit('7')">7</button>
+                <button class="digit" onclick="pressDigit('8')">8</button>
+                <button class="digit" onclick="pressDigit('9')">9</button>
+                <button class="digit" onclick="pressDigit('*')">*</button>
+                <button class="digit" onclick="pressDigit('0')">0</button>
+                <button class="digit" onclick="pressDigit('#')">#</button>
+              </div>
+              
+              <div class="d-flex justify-content-center gap-3 mt-4">
+                <button id="start-btn" class="btn btn-success" onclick="startCall()">Start Call</button>
+                <button id="end-btn" class="btn btn-danger" onclick="endCall()" disabled>End Call</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Speech Input / KB Lookup -->
+        <div class="col-md-6">
+          <div class="glass-card mb-4">
+            <h5 class="mb-3">Simulated Voice / Statement Input</h5>
+            <p class="text-muted small">Type a natural sentence to simulate conversational speech input parsed by the local NLP model.</p>
+            <div class="input-group mb-3">
+              <input type="text" id="voice-input" class="form-input" placeholder="e.g. I want to check my account balance">
+              <button class="btn btn-primary" onclick="sendVoiceText()">Send Text</button>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-outline-info btn-sm" onclick="startSpeechRecognition()">🎙️ Start Local Mic</button>
+              <div class="small text-muted" id="speech-recognition-status">Mic Ready</div>
+            </div>
+          </div>
+
+          <div class="glass-card mb-4">
+            <h5 class="mb-3">Speech Synthesis Controls</h5>
+            <div class="form-group mb-2">
+              <label class="form-label">TTS Voice Volume</label>
+              <input type="range" class="form-range" id="tts-volume" min="0" max="1" step="0.1" value="1">
+            </div>
+            <div class="form-group mb-2">
+              <label class="form-label">Playback Speed</label>
+              <input type="range" class="form-range" id="tts-rate" min="0.5" max="2" step="0.1" value="1">
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <h5 class="mb-3">Real-time NLP Insights</h5>
+            <div class="p-3 bg-dark rounded border border-secondary mb-2">
+              <strong>Detected Intent:</strong> <span class="badge bg-primary" id="nlp-intent">-</span>
+            </div>
+            <div class="p-3 bg-dark rounded border border-secondary mb-2">
+              <strong>Sentiment:</strong> <span class="badge bg-secondary" id="nlp-sentiment">-</span>
+            </div>
+            <div class="p-3 bg-dark rounded border border-secondary">
+              <strong>Extracted Entities:</strong>
+              <div class="mt-2" id="nlp-entities"><small class="text-muted">None detected yet.</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/simulator.js') }}"></script>
+</body>
+</html>
