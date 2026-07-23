@@ -1,3 +1,8 @@
-fastapi
-uvicorn
-pydantic
+Flask
+numpy
+scikit-learn
+nltk
+textblob
+spacy
+pypdf
+python-docx
